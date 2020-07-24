@@ -1,78 +1,113 @@
-# baitap1
+# baitap2
 
-Bài tập về user, group, SSH
-1/ Tạo 3 user(user-1, user-2, user-3), 2 group(groupA, groupB)
+Virtual host (Apache)
+1/ Cài đặt apache hoặc nginx
 
-Add user
+- sudo apt-get install apache2
+- ![Text Image](img/createapache.png)
 
-- sudo adduser user-1
-- sudo adduser user-2
+2/ Tạo virtual theo ví dụ
 
-* sudo adduser user-3
+2.1 Cài đặt Apache Web Server
 
-Add group
-
-- sudo groupadd groupA
-
-* sudo groupadd groupB
-
-![Text Image](img/hinh1.png)
+- sudo apt-get install apache2
 
 ---
 
-2/ Cho user-1, user-2 vào groupA, user-3 vào groupB
+2.2Tạo thư mục lưu trữ web cho mỗi một Website.
 
-- sudo usermod -a -G groupA user-1
-
-- sudo usermod -a -G groupA user-2
-
-- sudo usermod -a -G groupB user-3
-  ![Text Image](img/hinh2.png)
+Tạo thư mục lưu trữ source code cho 2 website: - sudo mkdir -p /var/www/html/vinasupport_a/public_html - sudo mkdir -p /var/www/html/vinasupport_b/public_html
 
 ---
 
-3/ Tạo file-a cho user-1 được 3 quyền (read write execute) và groupA chỉ có quyền read.
+Tạo file index.html cho website vinasupport-a.com:
 
-Tạo file-a.txt
-![Text Image](img/file-a.png)
+- sudo nano /var/www/html/vinasupport_a/public_html/index.html
+  ![Text Image](img/index-a.png)
 
-Đổi chủ sở hữu của file-a.txt thành user-1:groupB
-![Text Image](img/doiquyen.png)
+Tạo file index.html cho website vinasupport-b.com:
 
-Cấp quyền
-![Text Image](img/cq.png)
-
-Xem quyền
-![Text Image](img/xemquyen.png)
-
-4/ Connect SSH (dùng password) từ máy mình đến một máy bất kì trong mạng (upload 1 file từ máy mình và download 1 file về máy mình)
-
-Upload file
-
-- scp test.txt user-1@192.168.0.48:nguyenthininhbinh.txt
-  ![Text Image](img/uploadfile.png)
-
-Downloadfile
-
-- scp user-1@192.168.0.48:nguyenthininhbinh.txt test.txt
-  ![Text Image](img/downloadfile.png)
+- sudo nano /var/www/html/vinasupport_b/public_html/index.html
+  ![Text Image](img/index-b.png)
 
 ---
 
-5/Tạo SSH key để đặng nhập vào server (một máy của bạn bất kì trong mạng) không dùng mật khẩu
+2.3 Phân quyền cho thư mục lưu trữ website
 
-Create SSH key
+- sudo chown -R www-data:www-data /var/www/html/vinasupport_a/public_html
+- sudo chown -R www-data:www-data /var/www/html/vinasupport_b/public_html
+- sudo chmod -R 755 /var/www/html
 
-- ssh-keygen -t rsa -b 4096 -C "binh.nguyen24hdev@gmail.com"
-  ![Text Image](img/keyssh.png)
+---
 
-Thêm public key
-cat ~/.ssh/id_rsa.pub | ssh user-1@192.168.0.48 "mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && chmod -R go= ~/.ssh && cat >> ~/.ssh/authorized_keys"
+2.4. Tạo file Virtual hosts config cho mỗi website
 
-![Text Image](img/publickey.png)
+- sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/vinasupport-a.test.conf
+- sudo nano /etc/apache2/sites-available/vinasupport-a.test.conf
+  ![Text Image](img/h1.png)
+- sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/vinasupport-b.test.conf
+- sudo nano /etc/apache2/sites-available/vinasupport-b.test.conf
+  ![Text Image](img/h2.png)
 
-cach dang nhap khong can pass
+---
 
-- ssh -i ~/.ssh/id_rsa user-1@192.168.0.48
+2.5. Kích hoạt file config của Apache Virtual Hosts
 
-![Text Image](img/nopass.png)
+- sudo a2dissite 000-default.conf
+- sudo a2ensite vinasupport-a.test.conf
+- sudo a2ensite vinasupport-b.test.conf
+
+---
+
+- sudo systemctl reload apache2
+
+---
+
+- sudo nano /etc/hosts
+- ![Text Image](img/etc_hosts.png)
+
+---
+
+2.6 Test config
+
+- ![Text Image](img/vinasupport-a.png)
+- ![Text Image](img/vinasupport-b.png)
+
+3/. Cấu hình thêm 1 virtual host có domain là google.com.vn
+
+- sudo apt-get install apache2
+
+---
+
+- sudo mkdir -p /var/www/html/google.com.vn/public_html
+
+---
+
+- sudo nano /var/www/html/google.com.vn/public_html/index.html
+- ![Text Image](img/index-gg.png)
+
+---
+
+- sudo chown -R www-data:www-data /var/www/html/google.com.vn/public_html
+- sudo chmod -R 755 /var/www/html
+
+---
+
+- sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/google.com.vn.conf
+- sudo nano /etc/apache2/sites-available/google.com.vn.conf
+  ![Text Image](img/virtualhosts-gg.png)
+
+- sudo a2ensite google.com.vn.conf
+
+* sudo systemctl reload apache2
+
+---
+
+- sudo nano /etc/hosts
+- ![Text Image](img/etc_hosts.png)
+
+---
+
+**ket qua**
+
+- ![Text Image](img/gg.png)
